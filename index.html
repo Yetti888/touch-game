@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Touch Game</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="menu-screen">
+
+    <div class="menu-container">
+        <h1 class="game-title">Touch Game</h1>
+
+        <button class="menu-btn" onclick="startGame()">Почати гру</button>
+        <button class="menu-btn" onclick="showRules()">Правила</button>
+
+        <p class="record-text">Рекорд: <span id="bestScore">0</span></p>
+    </div>
+
+    <!-- Модальне вікно правил -->
+    <div id="rulesModal" class="modal">
+        <div class="modal-content">
+            <h2>Правила</h2>
+            <p>Натискай на круги, поки не закінчиться час. Чим більше очок — тим краще!</p>
+            <button class="menu-btn" onclick="closeRules()">Закрити</button>
+        </div>
+    </div>
+
+<script>
+    function startGame() {
+        window.location.href = "game.html";
+    }
+
+    function showRules() {
+        document.getElementById("rulesModal").style.display = "flex";
+    }
+
+    function closeRules() {
+        document.getElementById("rulesModal").style.display = "none";
+    }
+
+    // Показати рекорд
+    document.getElementById("bestScore").textContent =
+        localStorage.getItem("bestScore") || 0;
+
+    // Реєстрація Service Worker для PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('Service Worker зареєстровано'))
+        .catch(err => console.log('Помилка Service Worker:', err));
+    }
+</script>
+
+</body>
+</html>
