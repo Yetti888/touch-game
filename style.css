@@ -133,13 +133,11 @@ body, html {
 /* ----------------- Вибух ----------------- */
 .explosion {
     position: absolute;
-    width: 128px;  /* ширина одного кадру спрайту */
-    height: 128px; /* висота одного кадру */
+    width: 128px; /* розмір одного кадру спрайта */
+    height: 128px;
+    background: url('explosion-sheet.png') 0 0 no-repeat;
     pointer-events: none;
-    background-image: url('explosion/explosion-sheet.png');
-    background-size: 800% 100%; /* 8 кадрів по горизонталі */
-    animation: explodeAnim 0.5s steps(8) forwards;
-    z-index: 999;
+    z-index: 200;
 }
 
 @keyframes explodeAnim {

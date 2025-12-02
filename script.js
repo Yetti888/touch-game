@@ -2,27 +2,39 @@ const gameArea = document.getElementById("game-area");
 let score = 0;
 let time = 30;
 let timerInterval;
-
-let level = 1;          // рівень
-let baseSpeed = 1.2;    // базова швидкість руху кульок
+let speedFactor = 1;
 
 // Звуки
-const popSounds = [
+const sounds = [
     new Audio("pop_1.wav"),
     new Audio("pop_2.wav")
 ];
 
-const explosionSound = new Audio("explosion.wav");
-
-function playPop() {
-    const s = popSounds[Math.floor(Math.random() * popSounds.length)];
+function playSound() {
+    const s = sounds[Math.floor(Math.random() * sounds.length)];
     s.currentTime = 0;
     s.play();
 }
 
-function playExplosion() {
-    explosionSound.currentTime = 0;
-    explosionSound.play();
+// Анімація вибуху спрайтом
+function spawnExplosion(x, y) {
+    const explosion = document.createElement("div");
+    explosion.classList.add("explosion");
+    explosion.style.left = (x - 64) + "px";
+    explosion.style.top = (y - 64) + "px";
+    gameArea.appendChild(explosion);
+
+    // Анімація спрайта
+    let frame = 0;
+    const totalFrames = 8;
+    const interval = setInterval(() => {
+        explosion.style.backgroundPosition = `-${frame * 128}px 0`;
+        frame++;
+        if (frame >= totalFrames) {
+            clearInterval(interval);
+            explosion.remove();
+        }
+    }, 50);
 }
 
 function startGame() {
@@ -45,52 +57,48 @@ function spawnCircle() {
     const size = Math.floor(Math.random() * 70) + 40;
     circle.style.width = size + "px";
     circle.style.height = size + "px";
-
     circle.style.background = randomColor();
 
-    const x = Math.random() * (gameArea.clientWidth - size);
-    const y = Math.random() * (gameArea.clientHeight - size);
+    // Початкове положення
+    let x = Math.random() * (gameArea.clientWidth - size);
+    let y = Math.random() * (gameArea.clientHeight - size);
     circle.style.left = x + "px";
     circle.style.top = y + "px";
 
-    // швидкість за рівнем
-    const speed = baseSpeed + level * 0.5;
+    gameArea.appendChild(circle);
 
-    let dx = (Math.random() - 0.5) * speed * 2;
-    let dy = (Math.random() - 0.5) * speed * 2;
+    // Рух кульки
+    let dx = (Math.random() * 2 - 1) * speedFactor;
+    let dy = (Math.random() * 2 - 1) * speedFactor;
 
-    function move() {
-        if (!circle.parentNode) return;
+    const moveInterval = setInterval(() => {
+        x += dx;
+        y += dy;
 
-        let cx = circle.offsetLeft + dx;
-        let cy = circle.offsetTop + dy;
+        if (x <= 0 || x + size >= gameArea.clientWidth) dx = -dx;
+        if (y <= 0 || y + size >= gameArea.clientHeight) dy = -dy;
 
-        if (cx <= 0 || cx >= gameArea.clientWidth - size) dx *= -1;
-        if (cy <= 0 || cy >= gameArea.clientHeight - size) dy *= -1;
+        circle.style.left = x + "px";
+        circle.style.top = y + "px";
+    }, 20);
 
-        circle.style.left = (circle.offsetLeft + dx) + "px";
-        circle.style.top = (circle.offsetTop + dy) + "px";
+    circle.addEventListener("click", (event) => {
+        const rect = circle.getBoundingClientRect();
+        const centerX = rect.left + size / 2;
+        const centerY = rect.top + size / 2;
 
-        requestAnimationFrame(move);
-    }
+        playSound();
+        spawnExplosion(centerX, centerY);
 
-    requestAnimationFrame(move);
-
-    circle.addEventListener("click", () => {
         score++;
         document.getElementById("score").textContent = score;
 
-        playExplosion();
+        speedFactor += 0.05; // Кожен клік трохи прискорює кульки
 
+        clearInterval(moveInterval);
         circle.remove();
-
-        // оновлення рівня
-        level = Math.floor(score / 5) + 1;
-
         spawnCircle();
     });
-
-    gameArea.appendChild(circle);
 }
 
 function randomColor() {
@@ -119,10 +127,9 @@ function endGame() {
 function restartGame() {
     score = 0;
     time = 30;
-    level = 1;
-
-    document.getElementById("score").textContent = 0;
-    document.getElementById("time").textContent = 30;
+    speedFactor = 1;
+    document.getElementById("score").textContent = score;
+    document.getElementById("time").textContent = time;
 
     document.getElementById("resultModal").style.display = "none";
 
