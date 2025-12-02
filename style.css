@@ -97,8 +97,10 @@ body, html {
     justify-content: space-between;
     align-items: center;
     z-index: 100;
-    color: #fff;
-    font-size: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7); /* таймер і очки видно на будь-якому фоні */
 }
 
 .back-btn {
@@ -114,14 +116,33 @@ body, html {
     background: #ff1a1a;
 }
 
-/* ----------------- Круги ----------------- */
+/* ----------------- Кулі ----------------- */
 .circle {
     position: absolute;
     border-radius: 50%;
     cursor: pointer;
-    transition: transform 0.1s ease;
+    border: 2px solid #fff; /* для видимості */
+    transition: transform 0.1s ease, opacity 0.1s ease;
 }
 
 .circle:active {
     transform: scale(0.8);
+    opacity: 0.8;
+}
+
+/* ----------------- Вибух ----------------- */
+.explosion {
+    position: absolute;
+    width: 128px;  /* ширина одного кадру спрайту */
+    height: 128px; /* висота одного кадру */
+    pointer-events: none;
+    background-image: url('explosion/explosion-sheet.png');
+    background-size: 800% 100%; /* 8 кадрів по горизонталі */
+    animation: explodeAnim 0.5s steps(8) forwards;
+    z-index: 999;
+}
+
+@keyframes explodeAnim {
+    0% { background-position: 0% 0; }
+    100% { background-position: 100% 0; }
 }
